@@ -52,4 +52,5 @@ export type RunOptions = {
   flatTranslations?: boolean,
   translationSeparator?: string,
   translationContextSeparator?: string,
+  transformKey?(k: string): string;
 };

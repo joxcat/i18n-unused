@@ -7,6 +7,7 @@ import {
   MissedTranslations,
   ModuleResolver,
   TranslationKeyMatcher,
+  RunOptions,
 } from '../types';
 
 import { resolveFile } from '../helpers/files';
@@ -106,6 +107,7 @@ interface missedOptions {
   localeFileParser?: ModuleResolver;
   excludeTranslationKey?: string | string[];
   translationKeyMatcher?: TranslationKeyMatcher;
+  transformKey?: RunOptions['transformKey'];
 }
 
 export const collectMissedTranslations = async (
@@ -118,6 +120,7 @@ export const collectMissedTranslations = async (
     contextSeparator,
     excludeTranslationKey,
     translationKeyMatcher,
+    transformKey,
   }: missedOptions,
 ): Promise<MissedTranslations> => {
   const translations: MissedTranslation = [];
@@ -153,8 +156,11 @@ export const collectMissedTranslations = async (
         .map((v) => {
           const [match] = v.match(/\((.*?)\)/gi);
           const [translation] = match.split(',');
+          const transformed = transformKey
+            ? transformKey(translation)
+            : translation;
 
-          return translation.replace(/(\(|\)|\[\d\])/gi, '');
+          return transformed.replace(/(\(|\)|\[\d\])/gi, '');
         })
         .filter((v) => !flatKeys.includes(replaceQuotes(v)));
 
